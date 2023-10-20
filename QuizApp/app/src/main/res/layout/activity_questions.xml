@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/colorPrimaryVariant"
+    tools:context=".QuestionsActivity">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/top_bar"
+        android:background="?attr/colorPrimary"
+        android:elevation="5dp"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_quesID"
+            android:text="1/25"
+            android:layout_weight="1"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_timer"
+            android:text="20:15 min"
+            android:layout_weight="1"
+            android:textColor="#2DF836"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:id="@+id/btnSubmit"
+            android:text="Submit"
+            android:background="@drawable/button_border"
+            android:backgroundTint="@android:color/holo_orange_light"
+            android:textColor="@color/white"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/ll4"
+        android:orientation="horizontal"
+        android:background="@drawable/main_background"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/top_bar"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/qa_catName"
+            android:text="GK"
+            android:layout_weight="1"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            />
+
+        <ImageView
+            android:id="@+id/btnQua_bookmark"
+            android:layout_width="24dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/ic_bookmark" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnVoice"
+            android:layout_weight="1"
+            android:src="@drawable/ic_voice"
+            />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnQues_Del"
+            android:layout_weight="1"
+            android:src="@drawable/ic_ques_del"
+            />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnQues_list_grid"
+            android:layout_weight="1"
+            android:src="@drawable/ic_right_menu"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/ll3"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center"
+        android:background="?attr/colorPrimary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        >
+        <ImageButton
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnPrev_ques"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="24dp"
+            android:src="@drawable/ic_lleft"
+            android:background="@color/navy"
+            />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:id="@+id/btnClear_sel"
+            android:background="@drawable/button_border"
+            android:text="Clear Selection"
+            android:textColor="@color/white"
+            />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:id="@+id/btnMark"
+            android:layout_marginLeft="8dp"
+            android:background="@drawable/button_border"
+            android:text="Mark for Review"
+            android:textColor="@color/white"
+            />
+
+        <ImageButton
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/btnNext_ques"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="8dp"
+            android:src="@drawable/ic_right"
+            android:background="@color/navy"
+            />
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:id="@+id/questions_view"
+        android:layout_margin="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/ll3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ll4"
+        >
+    </androidx.recyclerview.widget.RecyclerView>
+    <ImageView
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:src="@drawable/flag"
+        android:id="@+id/mark_image"
+        android:elevation="5dp"
+        android:layout_marginEnd="16dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ll4"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

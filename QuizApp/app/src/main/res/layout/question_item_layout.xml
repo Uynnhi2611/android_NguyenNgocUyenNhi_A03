@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_question"
+        android:layout_margin="8dp"
+        android:padding="8dp"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:text="Question No 1"
+        android:textStyle="bold"
+        android:scrollbars="vertical"
+        android:background="@android:color/white"
+        android:inputType="textMultiLine"
+        android:elevation="5dp"
+        android:translationZ="3dp"
+        />
+
+    <Button
+        android:id="@+id/optionA"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/unselected_btn"
+        android:elevation="3dp"
+        android:stateListAnimator="@null"
+        android:text="option A"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:translationZ="3dp"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/optionB"
+        android:textColor="@android:color/black"
+        android:text="option B"
+        android:textSize="16sp"
+        android:background="@drawable/unselected_btn"
+        android:elevation="3dp"
+        android:translationZ="3dp"
+        android:stateListAnimator="@null"
+        android:layout_marginTop="16dp"
+        />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/optionC"
+        android:textColor="@android:color/black"
+        android:text="option C"
+        android:textSize="16sp"
+        android:background="@drawable/unselected_btn"
+        android:elevation="3dp"
+        android:translationZ="3dp"
+        android:stateListAnimator="@null"
+        android:layout_marginTop="16dp"
+        />
+
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/optionD"
+        android:textColor="@android:color/black"
+        android:text="option D"
+        android:textSize="16sp"
+        android:background="@drawable/unselected_btn"
+        android:elevation="3dp"
+        android:translationZ="3dp"
+        android:stateListAnimator="@null"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        />
+
+
+</LinearLayout>

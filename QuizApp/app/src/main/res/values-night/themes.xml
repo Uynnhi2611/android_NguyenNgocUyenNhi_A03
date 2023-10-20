@@ -1,0 +1,12 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.QuizApp" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <!-- Define colorPrimary and colorPrimaryVariant as attributes -->
+        <item name="colorPrimary">@color/bar_dark</item>
+        <item name="colorPrimaryVariant">@color/main_bg_dark</item>
+
+        <!-- Use the attributes -->
+        <item name="android:colorPrimary">?attr/colorPrimary</item>
+        <item name="android:colorPrimaryDark">?attr/colorPrimaryVariant</item>
+    </style>
+</resources>
