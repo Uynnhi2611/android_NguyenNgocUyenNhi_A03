@@ -2,6 +2,9 @@ package com.example.quizapp;
 
 import static androidx.constraintlayout.widget.ConstraintLayoutStates.TAG;
 
+import static com.example.quizapp.DbQuery.createTest;
+import static com.example.quizapp.DbQuery.g_firestore;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,15 +16,18 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.quizapp.Adapters.CategoryAdapter;
 import com.example.quizapp.Adapters.TestAdapter;
 import com.example.quizapp.Models.CategoryModel;
 import com.example.quizapp.Models.TestModel;
@@ -33,7 +39,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-public class TestActivity extends AppCompatActivity {
+public class TestActivity extends AppCompatActivity  {
 
     private RecyclerView testView;
     private Toolbar toolbar;
@@ -42,7 +48,6 @@ public class TestActivity extends AppCompatActivity {
     private TextView dialogText;
     private ImageView btnAdd,btnDel;
     private DocumentReference docRef;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +64,7 @@ public class TestActivity extends AppCompatActivity {
 
         testView = findViewById(R.id.test_recycler_view);
 
+
         progressDialog = new Dialog(TestActivity.this);
         progressDialog.setContentView(R.layout.dialog_layout);
         progressDialog.setCancelable(false);
@@ -72,10 +78,7 @@ public class TestActivity extends AppCompatActivity {
         layoutManager.setOrientation(RecyclerView.VERTICAL);
         testView.setLayoutManager(layoutManager);
 
-        adapter = new TestAdapter(DbQuery.g_testList);
 
-
-        //loadTestData();
         DbQuery.loadTestData(new MyCompleteListener() {
             @Override
             public void onSuccess() {
@@ -104,153 +107,144 @@ public class TestActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
             }
         });
-
-        // Khởi tạo adapter và docRef
-        adapter = new TestAdapter(DbQuery.g_testList);
-        docRef = DbQuery.g_firestore.collection("QUIZ").document(DbQuery.g_current_cat_id).collection("TESTS_LIST").document("TESTS_INFO");
-
-        // Thêm lắng nghe viên cho Firestore
-        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot snapshot,
-                                @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w(TAG, "Listen failed.", e);
-                    return;
-                }
-
-                if (snapshot != null && snapshot.exists()) {
-                    // Cập nhật danh sách bài kiểm tra với dữ liệu mới từ snapshot
-                    // TODO: Thêm mã để phân tích dữ liệu từ snapshot và cập nhật DbQuery.g_testList
-                    // Thông báo cho adapter về sự thay đổi dữ liệu
-                    adapter.notifyDataSetChanged();
-                } else {
-                    Log.d(TAG, "Current data: null");
-                }
-            }
-        });
-
         btnAdd = findViewById(R.id.btnAdd);
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 addTest();
             }
         });
-    }
+        // Tìm nút xóa trong layout
+        btnDel = findViewById(R.id.btnDelete);
 
-      /*  btnDel = findViewById(R.id.btnDel);
+        // Đặt sự kiện click cho nút xóa
         btnDel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Hiển thị hộp thoại cho phép người dùng chọn bài kiểm tra để xóa
-                AlertDialog.Builder builder = new AlertDialog.Builder(TestActivity.this);
-                builder.setTitle("Select a test to delete");
-
-                // Tạo một mảng chứa tên của tất cả các bài kiểm tra
-                String[] testNames = new String[DbQuery.g_testList.size()];
-                for (int i = 0; i < DbQuery.g_testList.size(); i++) {
-                    testNames[i] = DbQuery.g_testList.get(i).getTestID();
-                }
-
-                builder.setItems(testNames, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // 'which' là chỉ số của bài kiểm tra được chọn
-                        DbQuery.g_testList.remove(which);
-
-                        // Cập nhật dữ liệu trên Firebase
-                        DbQuery.deleteTest(which, new MyCompleteListener() {
-                            @Override
-                            public void onSuccess() {
-                                // Cập nhật adapter để phản ánh sự thay đổi trong danh sách bài kiểm tra
-                                adapter.notifyItemRemoved(which);
-
-                                Toast.makeText(TestActivity.this, "Test deleted successfully.", Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void onFailure() {
-                                Toast.makeText(TestActivity.this, "Something went wrong! Please try again.", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                });
-
-                // Hiển thị hộp thoại
-                builder.show();
+                deleteTest();
             }
         });
-    }*/
 
-    private void addTest() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setCancelable(true);
+    }
+    private void addTest(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(TestActivity.this);
 
-        View view = getLayoutInflater().inflate(R.layout.add_test_dialog_layout, null);
-        Button btnUpload = view.findViewById(R.id.btnUpload);
-        EditText inputTestID = view.findViewById(R.id.inputTest_ID);
-        EditText inputTestTime = view.findViewById(R.id.inputTest_Time);
+        LayoutInflater inflater = getLayoutInflater();
 
-        builder.setView(view);
+        // Sử dụng LayoutInflater để chuyển đổi add_test_dialog_layout thành View
+        View dialogLayout = inflater.inflate(R.layout.add_test_dialog_layout, null);
+        // Đặt dialogLayout làm layout cho AlertDialog
+        builder.setView(dialogLayout);
+        // Tạo AlertDialog
         AlertDialog alertDialog = builder.create();
+        // Tìm btnUpload trong dialogLayout
+        Button btnUpload = dialogLayout.findViewById(R.id.btnUpload);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-
         btnUpload.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                String testID = inputTestID.getText().toString();
-                String testTimeStr = inputTestTime.getText().toString();
-                if (!testID.isEmpty() && !testTimeStr.isEmpty()) {
-                    int testTime = Integer.parseInt(testTimeStr); // Chuyển đổi chuỗi thành số nguyên
-                    // Tạo một đối tượng TestModel mới
-                    TestModel newTest = new TestModel(testID, 0, testTime);
-                    // Thêm đối tượng này vào danh sách test của category hiện tại
-                    DbQuery.g_testList.add(newTest);
-                    // Cập nhật dữ liệu trên Firebase
-                    DbQuery.createTest(newTest, DbQuery.g_testList.size(), new MyCompleteListener() {
+            public void onClick(View view) {
+                // Lấy dữ liệu từ EditTexts
+                String testId = ((EditText) dialogLayout.findViewById(R.id.inputTest_ID)).getText().toString();
+                int testTime = Integer.parseInt(((EditText) dialogLayout.findViewById(R.id.inputTest_Time)).getText().toString());
+
+                // Tạo một TestModel mới với dữ liệu đã lấy
+                TestModel newTest = new TestModel(testId, 0, testTime);
+                DbQuery.g_testList.add(newTest);
+                // Gọi hàm createTest để tải dữ liệu lên Firebase
+                createTest(DbQuery.g_current_cat_id, newTest, new MyCompleteListener() {
+                    @Override
+                    public void onSuccess() {
+                        Toast.makeText(TestActivity.this, "Test added successfully!", Toast.LENGTH_SHORT).show();
+                        // Cập nhật noOfTests trong g_catList
+                        CategoryModel category = DbQuery.g_catList.get(DbQuery.g_selected_cat_index);
+                        category.setNoOfTests(category.getNoOfTests() + 1);
+
+                        // Gọi notifyDataSetChanged() trên adapter của g_catList
+
+                        DocumentReference categoryDoc = g_firestore.collection("QUIZ").document(DbQuery.g_current_cat_id);
+                        categoryDoc.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                            @Override
+                            public void onEvent(@Nullable DocumentSnapshot snapshot,
+                                                @Nullable FirebaseFirestoreException e) {
+                                if (e != null) {
+                                    Log.w(TAG, "Listen failed.", e);
+                                    return;
+                                }
+
+                                if (snapshot != null && snapshot.exists()) {
+                                    Long noOfTests = snapshot.getLong("NO_OF_TESTS");
+                                    // Cập nhật g_testList và giao diện người dùng của bạn ở đây
+                                    adapter.notifyDataSetChanged();
+                                } else {
+                                    Log.d(TAG, "Current data: null");
+                                }
+                            }
+                        });
+
+
+                    }
+                    @Override
+                    public void onFailure() {
+                        Toast.makeText(TestActivity.this, "Failed to add test.", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                // Đóng AlertDialog sau khi tải dữ liệu lên Firebase
+                alertDialog.dismiss();
+            }
+        });
+
+        // Hiển thị AlertDialog
+        alertDialog.show();
+    }
+    private void deleteTest(){
+        // Kiểm tra xem danh sách có rỗng hay không
+        if (DbQuery.g_testList.isEmpty()) {
+            Toast.makeText(TestActivity.this, "Không có bài kiểm tra nào! Vui lòng thêm một bài.", Toast.LENGTH_SHORT).show();
+        } else {
+            // Tạo một hộp thoại mới
+            AlertDialog.Builder builder = new AlertDialog.Builder(TestActivity.this);
+            builder.setTitle("Select a Test to Delete");
+
+            // Tạo một danh sách các TEST_ID
+            String[] testIds = new String[DbQuery.g_testList.size()];
+            for (int i = 0; i < DbQuery.g_testList.size(); i++) {
+                testIds[i] = DbQuery.g_testList.get(i).getTestID();
+            }
+
+            builder.setItems(testIds, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // Xóa bài kiểm tra khi một TEST_ID được chọn
+                    DbQuery.deleteTest(which + 1, new MyCompleteListener() {
                         @Override
                         public void onSuccess() {
-                            Toast.makeText(view.getContext(), "Add Successful!", Toast.LENGTH_SHORT).show();
-                            DocumentReference docRef = db.collection("QUIZ").document(DbQuery.g_current_cat_id);
-                            docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                            Toast.makeText(TestActivity.this, "Delete Successful!", Toast.LENGTH_SHORT).show();
+                            DbQuery.updateTestIndices(which + 1, new MyCompleteListener() {
                                 @Override
-                                public void onEvent(@Nullable DocumentSnapshot snapshot,
-                                                    @Nullable FirebaseFirestoreException e) {
-                                    if (e != null) {
-                                        Log.w(TAG, "Listen failed.", e);
-                                        return;
-                                    }
+                                public void onSuccess() {
+                                    // Cập nhật UI sau khi xóa thành công
+                                    adapter.notifyDataSetChanged();
+                                    Toast.makeText(TestActivity.this, "Update Successful!", Toast.LENGTH_SHORT).show();
+                                }
 
-                                    if (snapshot != null && snapshot.exists()) {
-                                        Log.d(TAG, "Current data: " + snapshot.getData());
-                                        // Cập nhật UI tại đây
-                                        CategoryModel category = DbQuery.g_catList.get(DbQuery.g_selected_cat_index);
-                                        category.setNoOfTests(category.getNoOfTests() + 1);
-                                        adapter.notifyDataSetChanged();
-                                    }
-                                    else {
-                                        Log.d(TAG, "Current data: null");
-                                    }
+                                @Override
+                                public void onFailure() {
+                                    Toast.makeText(TestActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
                                 }
                             });
-
                         }
 
                         @Override
                         public void onFailure() {
-                            Toast.makeText(view.getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(TestActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
                         }
                     });
-                } else {
-                    Toast.makeText(view.getContext(), "Enter test ID and time!", Toast.LENGTH_SHORT).show();
                 }
-                alertDialog.dismiss();
-            }
-        });
-        alertDialog.show();
+            });
 
+            // Hiển thị hộp thoại
+            builder.show();
+        }
     }
 
     public boolean onOptionsItemSelected(@NonNull MenuItem item){

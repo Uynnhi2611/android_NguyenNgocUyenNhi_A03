@@ -1,7 +1,11 @@
 package com.example.quizapp;
 
+import static androidx.constraintlayout.widget.ConstraintLayoutStates.TAG;
+
 import android.graphics.BitmapFactory;
 import android.util.ArrayMap;
+import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -10,8 +14,10 @@ import com.example.quizapp.Models.ProfileModel;
 import com.example.quizapp.Models.QuestionModel;
 import com.example.quizapp.Models.RankModel;
 import com.example.quizapp.Models.TestModel;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -504,23 +510,99 @@ public class DbQuery {
                   }
               });
   }
-    public static void createTest(TestModel newTest, int testIndex, MyCompleteListener completeListener) {
-        // Tạo một Map để lưu trữ dữ liệu của bài kiểm tra mới
-        Map<String, Object> testData = new HashMap<>();
-        testData.put("TEST" + testIndex + "_ID", newTest.getTestID());
-        testData.put("TEST" + testIndex + "_TIME", newTest.getTime());
+   public static void deleteCategory(String catId, MyCompleteListener completeListener) {
+       // Lấy tham chiếu đến document chứa thông tin danh mục
+       DocumentReference catDocRef = g_firestore.collection("QUIZ").document(catId);
 
-        // Tạo một document mới với TEST_ID trong collection "TESTS_LIST" của category hiện tại
-        DocumentReference newDoc = g_firestore.collection("QUIZ").document(DbQuery.g_current_cat_id).collection("TESTS_LIST").document("TESTS_INFO");
+       // Xóa document từ Firestore
+       catDocRef.delete()
+               .addOnSuccessListener(new OnSuccessListener<Void>() {
+                   @Override
+                   public void onSuccess(Void aVoid) {
+                       // Giảm số lượng danh mục trong "Categories"
+                       DocumentReference categoriesDoc = g_firestore.collection("QUIZ").document("Categories");
+                       categoriesDoc.update("COUNT", FieldValue.increment(-1));
 
-        // Thêm bài kiểm tra mới vào Firestore
-        newDoc.set(testData, SetOptions.merge())
+                       // Lấy số lượng danh mục hiện tại và cập nhật lại chỉ số
+                       categoriesDoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                           @Override
+                           public void onSuccess(DocumentSnapshot documentSnapshot) {
+                               Long count = documentSnapshot.getLong("COUNT");
+                               WriteBatch batch = g_firestore.batch();
+
+                               for (int i = 1; i <= count; i++) {
+                                   String nextCatId = documentSnapshot.getString("CAT" + (i + 1) + "_ID");
+                                   if (nextCatId != null) {
+                                       batch.update(categoriesDoc, "CAT" + i + "_ID", nextCatId);
+                                       batch.update(categoriesDoc, "CAT" + (i + 1) + "_ID", FieldValue.delete());
+                                   }
+                               }
+
+                               batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                   @Override
+                                   public void onComplete(@NonNull Task<Void> task) {
+                                       if (task.isSuccessful()) {
+                                           // Xóa danh mục khỏi g_catList
+                                           for (int i = 0; i < g_catList.size(); i++) {
+                                               if (g_catList.get(i).getDocID().equals(catId)) {
+                                                   g_catList.remove(i);
+                                                   break;
+                                               }
+                                           }
+                                           completeListener.onSuccess();
+                                       } else {
+                                           completeListener.onFailure();
+                                       }
+                                   }
+                               });
+                           }
+                       });
+                   }
+               })
+               .addOnFailureListener(new OnFailureListener() {
+                   @Override
+                   public void onFailure(@NonNull Exception e) {
+                       completeListener.onFailure();
+                   }
+               });
+   }
+    public static void createTest(String categoryId, TestModel newTest, MyCompleteListener completeListener) {
+        // Cập nhật số lượng test trong category
+        DocumentReference categoryDoc = g_firestore.collection("QUIZ").document(categoryId);
+        categoryDoc.update("NO_OF_TESTS", FieldValue.increment(1))
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        // Cập nhật số lượng test trong category hiện tại
-                        g_firestore.collection("QUIZ").document(DbQuery.g_current_cat_id)
-                                .update("NO_OF_TESTS", FieldValue.increment(1));
+                        // Lấy số lượng test hiện tại
+                        categoryDoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                Long count = documentSnapshot.getLong("NO_OF_TESTS");
+                                // Cập nhật TEST[i]_ID và TEST[i]_TIME trong TESTS_INFO
+                                DocumentReference testsInfoDoc = categoryDoc.collection("TESTS_LIST").document("TESTS_INFO");
+                                testsInfoDoc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                        if (task.isSuccessful()) {
+                                            DocumentSnapshot document = task.getResult();
+                                            if (document.exists()) {
+                                                // Document exists, update it
+                                                testsInfoDoc.update("TEST" + count + "_ID", newTest.getTestID());
+                                                testsInfoDoc.update("TEST" + count + "_TIME", newTest.getTime());
+                                            } else {
+                                                // Document does not exist, create it
+                                                Map<String, Object> data = new HashMap<>();
+                                                data.put("TEST" + count + "_ID", newTest.getTestID());
+                                                data.put("TEST" + count + "_TIME", newTest.getTime());
+                                                testsInfoDoc.set(data);
+                                            }
+                                        } else {
+                                            Log.d(TAG, "Failed with: ", task.getException());
+                                        }
+                                    }
+                                });
+                            }
+                        });
 
                         completeListener.onSuccess();
                     }
@@ -533,24 +615,27 @@ public class DbQuery {
                 });
     }
 
-   /* public static void deleteTest(int testIndex, MyCompleteListener completeListener) {
-        // Get a reference to the document that contains the test to be deleted
+    public static void deleteTest(int testIndex, MyCompleteListener completeListener) {
+        // Tạo một Map để lưu trữ các trường cần xóa
+        Map<String, Object> testData = new HashMap<>();
+        testData.put("TEST" + testIndex + "_ID", FieldValue.delete());
+        testData.put("TEST" + testIndex + "_TIME", FieldValue.delete());
+
+        // Lấy tham chiếu đến document chứa thông tin bài kiểm tra
         DocumentReference docRef = g_firestore.collection("QUIZ").document(DbQuery.g_current_cat_id).collection("TESTS_LIST").document("TESTS_INFO");
 
-        // Create a Map of the fields to be deleted
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("TEST" + testIndex + "_ID", FieldValue.delete());
-        updates.put("TEST" + testIndex + "_TIME", FieldValue.delete());
-
-        // Update the document
-        docRef.update(updates)
+        // Xóa các trường từ Firestore
+        docRef.update(testData)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        // Decrement the number of tests in the current category
+                        // Giảm số lượng test trong category hiện tại
                         g_firestore.collection("QUIZ").document(DbQuery.g_current_cat_id)
                                 .update("NO_OF_TESTS", FieldValue.increment(-1));
 
+                        // Xóa bài kiểm tra khỏi g_testList
+                        g_testList.remove(testIndex - 1);
+
                         completeListener.onSuccess();
                     }
                 })
@@ -560,45 +645,58 @@ public class DbQuery {
                         completeListener.onFailure();
                     }
                 });
-    }*/
+    }
+  public static void updateTestIndices(int deletedTestIndex, MyCompleteListener completeListener) {
+        // Lấy tham chiếu đến document chứa thông tin bài kiểm tra
+        DocumentReference docRef = g_firestore.collection("QUIZ").document(DbQuery.g_current_cat_id).collection("TESTS_LIST").document("TESTS_INFO");
 
-   /* public static void deleteCategory(int catIndex, MyCompleteListener completeListener) {
-        // Lấy tham chiếu đến tài liệu chứa danh mục cần xóa
-        DocumentReference catDocRef = g_firestore.collection("QUIZ").document(DbQuery.g_catList.get(catIndex).getDocID());
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        // Lấy danh sách tất cả các trường trong document
+                        Map<String, Object> fields = document.getData();
 
-        // Lấy tham chiếu đến tài liệu 'Categories'
-        DocumentReference categoriesDocRef = g_firestore.collection("QUIZ").document("Categories");
+                        WriteBatch batch = g_firestore.batch();
 
-        // Xóa tài liệu danh mục
-        catDocRef.delete()
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        // Xóa danh mục khỏi g_categoryList
-                        DbQuery.g_catList.remove(catIndex);
+                        for (String field : fields.keySet()) {
+                            // Xác định các trường nào có chỉ số lớn hơn chỉ số của bài test đã xóa
+                            String prefix = field.substring(0, 4);
+                            int index = Integer.parseInt(field.substring(4, field.indexOf('_')));
 
-                        // Nếu còn nhiều hơn một danh mục, cập nhật các ID danh mục trong 'Categories'
-                        if (DbQuery.g_catList.size() > 0) {
-                            for (int i = catIndex; i < DbQuery.g_catList.size(); i++) {
-                                categoriesDocRef.update("CAT" + (i + 1) + "_ID", DbQuery.g_catList.get(i).getDocID());
+                            if (prefix.equals("TEST") && index > deletedTestIndex) {
+                                // Xóa các trường này
+                                batch.update(docRef, field, FieldValue.delete());
+                                // Tạo lại các trường này với chỉ số giảm đi 1
+                                String newField = "TEST" + (index - 1) + field.substring(field.indexOf('_'));
+                                batch.update(docRef, newField, fields.get(field));
                             }
-                            // Xóa ID danh mục cuối cùng trong 'Categories'
-                            categoriesDocRef.update("CAT" + (DbQuery.g_catList.size() + 1) + "_ID", FieldValue.delete());
                         }
 
-                        // Giảm số lượng danh mục trong 'Categories'
-                        categoriesDocRef.update("COUNT", FieldValue.increment(-1));
-
-                        completeListener.onSuccess();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
+                        batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    completeListener.onSuccess();
+                                } else {
+                                    completeListener.onFailure();
+                                }
+                            }
+                        });
+                    } else {
+                        Log.d(TAG, "No such document");
                         completeListener.onFailure();
                     }
-                });
-    }*/
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                    completeListener.onFailure();
+                }
+            }
+        });
+    }
+
 
 
 }
