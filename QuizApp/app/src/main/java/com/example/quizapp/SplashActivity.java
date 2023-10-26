@@ -38,7 +38,6 @@ public class SplashActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-
                 if(mAuth.getCurrentUser()!= null){
                     DbQuery.loadData(new MyCompleteListener() {
                         @Override

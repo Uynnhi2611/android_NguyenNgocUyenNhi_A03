@@ -140,11 +140,11 @@ public class CategoryFragment extends Fragment {
     private void deleteCatgory(){
         // Kiểm tra xem danh sách có rỗng hay không
         if (DbQuery.g_catList.isEmpty()) {
-            Toast.makeText(getContext(), "Không có danh mục nào! Vui lòng thêm một danh mục.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "There are no categories! Please add a category.", Toast.LENGTH_SHORT).show();
         } else {
             // Tạo một hộp thoại mới
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle("Chọn một danh mục để xóa");
+            builder.setTitle("Select a category to delete.");
 
             // Tạo một danh sách các CAT_NAME
             String[] catNames = new String[DbQuery.g_catList.size()];
@@ -159,14 +159,14 @@ public class CategoryFragment extends Fragment {
                     deleteCategory(DbQuery.g_catList.get(which).getDocID(), new MyCompleteListener() {
                         @Override
                         public void onSuccess() {
-                            Toast.makeText(getContext(), "Xóa thành công!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Delete Successful!", Toast.LENGTH_SHORT).show();
                             // Cập nhật UI sau khi xóa thành công
                             adapter.notifyDataSetChanged();
                         }
 
                         @Override
                         public void onFailure() {
-                            Toast.makeText(getContext(), "Có lỗi xảy ra", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }

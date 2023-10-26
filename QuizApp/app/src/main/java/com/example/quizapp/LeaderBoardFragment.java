@@ -65,7 +65,7 @@ public class LeaderBoardFragment extends Fragment {
                         calculateRank();
                     }
                     myScoreTV.setText("Score: "+ myPerformance.getScore());
-                    myRankTV.setText("Rank - "+ myPerformance.getRank());
+                    myRankTV.setText("Rank: "+ myPerformance.getRank());
                 }
                 progressDialog.dismiss();
             }

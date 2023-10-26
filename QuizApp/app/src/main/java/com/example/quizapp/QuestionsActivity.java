@@ -237,7 +237,7 @@ public class QuestionsActivity extends AppCompatActivity {
                 // Kiểm tra xem danh sách câu hỏi còn câu hỏi nào không
                 if (g_quesList.isEmpty()) {
                     // Hiển thị thông báo "Không còn câu hỏi nào"
-                    Toast.makeText(QuestionsActivity.this, "Không còn câu hỏi nào", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(QuestionsActivity.this, "There are no more questions.", Toast.LENGTH_SHORT).show();
 
                     // Chuyển về StartTestActivity
                     Intent intent = new Intent(QuestionsActivity.this, StartTestActivity.class);
@@ -310,7 +310,7 @@ public class QuestionsActivity extends AppCompatActivity {
                 // Kiểm tra xem danh sách câu hỏi còn câu hỏi nào không
                 if (g_quesList.isEmpty()) {
                     // Hiển thị thông báo "Không còn câu hỏi nào"
-                    Toast.makeText(QuestionsActivity.this, "Không còn câu hỏi nào", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(QuestionsActivity.this, "There are no more questions.", Toast.LENGTH_SHORT).show();
                 } else {
                     // Lấy ID của câu hỏi hiện tại
                     String questionId = g_quesList.get(quesID).getqID();
@@ -328,7 +328,7 @@ public class QuestionsActivity extends AppCompatActivity {
                                     quesAdapter.notifyDataSetChanged();
 
                                     // Hiển thị thông báo "Câu hỏi đã bị xóa"
-                                    Toast.makeText(QuestionsActivity.this, "Câu hỏi đã bị xóa", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(QuestionsActivity.this, "Question has been deleted.", Toast.LENGTH_SHORT).show();
                                 }
                             })
                             .addOnFailureListener(new OnFailureListener() {

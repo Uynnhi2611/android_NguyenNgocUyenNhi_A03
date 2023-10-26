@@ -75,7 +75,7 @@ public class AccountFragment extends Fragment {
                             calculateRank();
                         }
                         score.setText("Score: "+ myPerformance.getScore());
-                        rank.setText("Rank - "+ myPerformance.getRank());
+                        rank.setText("Rank: "+ myPerformance.getRank());
                     }
                     progressDialog.dismiss();
                 }
@@ -90,7 +90,7 @@ public class AccountFragment extends Fragment {
         }else {
             score.setText("Score: "+ myPerformance.getScore());
             if(myPerformance.getScore()!=0)
-                rank.setText("Rank -"+myPerformance.getRank());
+                rank.setText("Rank: "+myPerformance.getRank());
         }
         btnLogout=view.findViewById(R.id.btnLogout);
         btnLogout.setOnClickListener(new View.OnClickListener() {

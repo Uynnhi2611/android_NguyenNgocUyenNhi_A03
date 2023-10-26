@@ -174,13 +174,14 @@ public class TestActivity extends AppCompatActivity  {
                                 if (snapshot != null && snapshot.exists()) {
                                     Long noOfTests = snapshot.getLong("NO_OF_TESTS");
                                     // Cập nhật g_testList và giao diện người dùng của bạn ở đây
+
                                     adapter.notifyDataSetChanged();
+
                                 } else {
                                     Log.d(TAG, "Current data: null");
                                 }
                             }
                         });
-
 
                     }
                     @Override
@@ -199,7 +200,7 @@ public class TestActivity extends AppCompatActivity  {
     private void deleteTest(){
         // Kiểm tra xem danh sách có rỗng hay không
         if (DbQuery.g_testList.isEmpty()) {
-            Toast.makeText(TestActivity.this, "Không có bài kiểm tra nào! Vui lòng thêm một bài.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(TestActivity.this, "There are no tests! Please add another post.", Toast.LENGTH_SHORT).show();
         } else {
             // Tạo một hộp thoại mới
             AlertDialog.Builder builder = new AlertDialog.Builder(TestActivity.this);

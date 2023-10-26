@@ -346,8 +346,6 @@ public class DbQuery {
                         for(int i=1;i<= catCount;i++){
                             String catID=catListDooc.getString("CAT"+ String.valueOf(i)+"_ID");
                             QueryDocumentSnapshot catDoc= docList.get(catID);
-                            /*Long noOfTestsLong = catDoc.getLong("NO_OF_TESTS");
-                            int noOfTest = noOfTestsLong != null ? noOfTestsLong.intValue() : 0;*/
                             Long noOfTestsLong = catDoc.getLong("NO_OF_TESTS");
                             int noOfTest = 0;
                             if (noOfTestsLong != null) {
@@ -405,8 +403,7 @@ public class DbQuery {
                 });
 
     }
-    public static void loadTestData(MyCompleteListener completeListener)
-    {
+    public static void loadTestData(MyCompleteListener completeListener) {
         g_testList.clear();
         g_firestore.collection("QUIZ").document(g_catList.get(g_selected_cat_index).getDocID())
                 .collection("TESTS_LIST").document("TESTS_INFO")
@@ -696,7 +693,4 @@ public class DbQuery {
             }
         });
     }
-
-
-
 }

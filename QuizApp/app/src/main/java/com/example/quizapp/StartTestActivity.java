@@ -204,25 +204,25 @@ public class StartTestActivity extends AppCompatActivity {
                                                     .addOnSuccessListener (new OnSuccessListener<Void>() {
                                                         @Override
                                                         public void onSuccess (Void aVoid) {
-                                                            Toast.makeText(view.getContext(), "Thêm câu hỏi thành công!", Toast.LENGTH_SHORT).show();
+                                                            Toast.makeText(view.getContext(), "Add Ques Successful!", Toast.LENGTH_SHORT).show();
                                                         }
                                                     })
                                                     .addOnFailureListener (new OnFailureListener() {
                                                         @Override
                                                         public void onFailure (@NonNull Exception e) {
-                                                            Toast.makeText (view.getContext (), "Đã xảy ra lỗi", Toast.LENGTH_SHORT).show ();
+                                                            Toast.makeText (view.getContext (), "Something went wrong", Toast.LENGTH_SHORT).show ();
                                                         }
                                                     });
                                         } else {
-                                            Toast.makeText (view.getContext (), "Không tìm thấy document TESTS_INFO", Toast.LENGTH_SHORT).show ();
+                                            Toast.makeText (view.getContext (), "Document TESTS_INFO not found.", Toast.LENGTH_SHORT).show ();
                                         }
                                     } else {
-                                        Toast.makeText (view.getContext (), "Không thể truy vấn dữ liệu từ Firestore", Toast.LENGTH_SHORT).show ();
+                                        Toast.makeText (view.getContext (), "Unable to query data from Firestore.", Toast.LENGTH_SHORT).show ();
                                     }
                                 }
                             });
                 } else {
-                    Toast.makeText (view.getContext (), "Vui lòng nhập đầy đủ thông tin!", Toast.LENGTH_SHORT).show ();
+                    Toast.makeText (view.getContext (), "Please enter complete information!", Toast.LENGTH_SHORT).show ();
                 }
                 alertDialog.dismiss ();
             }
