@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.example.quizapp.ManageQuesActivity;
+import com.example.quizapp.ManageTestActivity;
 import com.example.quizapp.Models.CategoryModel;
 import com.example.quizapp.DbQuery;
 import com.example.quizapp.R;
@@ -46,7 +48,7 @@ public class CategoryAdapter extends BaseAdapter {
             myView=view;
         }
 
-        myView.setOnClickListener(new View.OnClickListener() {
+       /* myView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 DbQuery.g_selected_cat_index = i;
@@ -54,7 +56,23 @@ public class CategoryAdapter extends BaseAdapter {
                 Intent intent = new Intent(view.getContext(), TestActivity.class);
                 view.getContext().startActivity(intent);
             }
+        });*/
+        myView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DbQuery.g_selected_cat_index = i;
+                DbQuery.g_current_cat_id = cat_list.get(i).getDocID(); // Cập nhật ID category hiện tại
+
+                Intent intent;
+                if (view.getContext() instanceof ManageQuesActivity) {
+                    intent = new Intent(view.getContext(), ManageTestActivity.class);
+                } else {
+                    intent = new Intent(view.getContext(), TestActivity.class);
+                }
+                view.getContext().startActivity(intent);
+            }
         });
+
 
 
 

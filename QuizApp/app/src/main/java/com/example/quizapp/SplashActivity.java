@@ -42,15 +42,20 @@ public class SplashActivity extends AppCompatActivity {
                     DbQuery.loadData(new MyCompleteListener() {
                         @Override
                         public void onSuccess() {
-                            Intent intent= new Intent(SplashActivity.this,MainActivity.class);
+                            Intent intent;
+                            if (mAuth.getCurrentUser().getEmail().equals("admin11@gmail.com")) {
+                                intent = new Intent(SplashActivity.this, AdminActivity.class);
+                            } else {
+                                intent = new Intent(SplashActivity.this, MainActivity.class);
+                            }
                             startActivity(intent);
                             SplashActivity.this.finish();
                         }
 
                         @Override
                         public void onFailure() {
-                            Toast.makeText(SplashActivity.this,"Something went wrong!Please Try Again Later!",Toast.LENGTH_SHORT).show();
-
+                            // Your code here. For example:
+                            Toast.makeText(SplashActivity.this,"Something went wrong! Please try again later!",Toast.LENGTH_SHORT).show();
                         }
                     });
 

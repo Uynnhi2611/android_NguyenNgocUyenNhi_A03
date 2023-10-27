@@ -109,29 +109,37 @@ public class LoginActivity extends AppCompatActivity {
     }
     private void login(){
         progressDialog.show();
-        mAuth.signInWithEmailAndPassword(email.getText().toString().trim(), pass.getText().toString().trim())
+        String userEmail = email.getText().toString().trim();
+        mAuth.signInWithEmailAndPassword(userEmail, pass.getText().toString().trim())
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
-                           Toast.makeText(LoginActivity.this,"Login Success",Toast.LENGTH_SHORT).show();
-                           DbQuery.loadData(new MyCompleteListener() {
-                               @Override
-                               public void onSuccess() {
-                                   progressDialog.dismiss();
-                                   Intent intent=new Intent(LoginActivity.this,MainActivity.class);
-                                   startActivity(intent);
-                                   finish();
-                               }
+                            if(userEmail.equals("admin11@gmail.com")) {
+                                Toast.makeText(LoginActivity.this,"Admin Login Success",Toast.LENGTH_SHORT).show();
+                                Intent intent=new Intent(LoginActivity.this,AdminActivity.class);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                Toast.makeText(LoginActivity.this,"Login Success",Toast.LENGTH_SHORT).show();
+                                DbQuery.loadData(new MyCompleteListener() {
+                                    @Override
+                                    public void onSuccess() {
+                                        progressDialog.dismiss();
+                                        Intent intent=new Intent(LoginActivity.this,MainActivity.class);
+                                        startActivity(intent);
+                                        finish();
+                                    }
 
-                               @Override
-                               public void onFailure() {
-                                   progressDialog.dismiss();
-                                   Toast.makeText(LoginActivity.this, "Something went wrong!Please try again.",
-                                           Toast.LENGTH_SHORT).show();
-                               }
-                           });
+                                    @Override
+                                    public void onFailure() {
+                                        progressDialog.dismiss();
+                                        Toast.makeText(LoginActivity.this, "Something went wrong!Please try again.",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
                         }else {
                             progressDialog.dismiss();
                             Toast.makeText(LoginActivity.this,task.getException().getMessage(), Toast.LENGTH_SHORT).show();
@@ -140,6 +148,7 @@ public class LoginActivity extends AppCompatActivity {
                 });
 
     }
+
     private void googleSignIn(){
         Intent signInIntent=mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent,RC_SIGN_IN);

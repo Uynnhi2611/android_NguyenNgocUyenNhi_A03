@@ -13,6 +13,24 @@
         android:theme="@style/Theme.QuizApp"
         tools:targetApi="31">
         <activity
+            android:name=".ManageRankActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ManageQuestionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ManageStartTestActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ManageTestActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ManageQuesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AdminActivity"
+            android:exported="false" />
+        <activity
             android:name=".BookmarksActivity"
             android:exported="false" />
         <activity

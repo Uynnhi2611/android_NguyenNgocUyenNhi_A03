@@ -221,6 +221,43 @@ public class DbQuery {
                     }
                 });
     }
+    public static void getRank(MyCompleteListener completeListener){
+        g_usersList.clear();
+        String myUID=FirebaseAuth.getInstance().getUid();
+        g_firestore.collection("USERS")
+                .whereGreaterThan("TOTAL_SCORE",0)
+                .orderBy("TOTAL_SCORE", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                        int rank=1;
+                        for(QueryDocumentSnapshot doc: queryDocumentSnapshots){
+
+                            g_usersList.add(new RankModel(
+                                    doc.getString("NAME"),
+                                    doc.getLong("TOTAL_SCORE").intValue(),
+                                    rank
+                            ));
+
+                            if(myUID.compareTo(doc.getId())==0){
+                                isMeOnTopList=true;
+                                myPerformance.setRank(rank);
+                            }
+                            rank++;
+                        }
+
+                        completeListener.onSuccess();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        completeListener.onFailure();
+                    }
+                });
+    }
+
     public static void loadBookmarks(MyCompleteListener completeListener){
         g_bookmarksList.clear();
         tmp=0;
@@ -365,8 +402,7 @@ public class DbQuery {
                     }
                 });
     }
-    public static void  loadquestions(MyCompleteListener completeListener)
-    {
+    public static void  loadquestions(MyCompleteListener completeListener)    {
         g_quesList.clear();
         g_firestore.collection("Questions")
                 .whereEqualTo("CATEGORY",g_catList.get(g_selected_cat_index).getDocID())

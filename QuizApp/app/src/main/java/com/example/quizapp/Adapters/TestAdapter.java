@@ -11,6 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.quizapp.DbQuery;
+import com.example.quizapp.ManageQuesActivity;
+import com.example.quizapp.ManageStartTestActivity;
+import com.example.quizapp.ManageTestActivity;
 import com.example.quizapp.R;
 import com.example.quizapp.StartTestActivity;
 import com.example.quizapp.Models.TestModel;
@@ -62,13 +65,19 @@ public class TestAdapter extends RecyclerView.Adapter<TestAdapter.ViewHolder> {
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    DbQuery.g_selected_test_index = pos;
 
-                    DbQuery.g_selected_test_index=pos;
-
-                    Intent intent=new Intent(itemView.getContext(), StartTestActivity.class);
-                    itemView.getContext().startActivity(intent);
+                    Intent intent;
+                    if (view.getContext() instanceof ManageTestActivity) {
+                        intent = new Intent(view.getContext(), ManageStartTestActivity.class);
+                    } else {
+                        intent = new Intent(view.getContext(), StartTestActivity.class);
+                    }
+                    view.getContext().startActivity(intent);
                 }
             });
+
+
         }
     }
 }

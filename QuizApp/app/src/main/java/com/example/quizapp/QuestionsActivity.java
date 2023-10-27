@@ -123,7 +123,7 @@ public class QuestionsActivity extends AppCompatActivity {
             }
         }
         btnVoice=findViewById(R.id.btnVoice);
-        btnQues_Del=findViewById(R.id.btnQues_Del);
+
 
 
     }
@@ -302,42 +302,6 @@ public class QuestionsActivity extends AppCompatActivity {
                             }
                         });
 
-            }
-        });
-        btnQues_Del.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Kiểm tra xem danh sách câu hỏi còn câu hỏi nào không
-                if (g_quesList.isEmpty()) {
-                    // Hiển thị thông báo "Không còn câu hỏi nào"
-                    Toast.makeText(QuestionsActivity.this, "There are no more questions.", Toast.LENGTH_SHORT).show();
-                } else {
-                    // Lấy ID của câu hỏi hiện tại
-                    String questionId = g_quesList.get(quesID).getqID();
-
-                    // Xóa câu hỏi từ Firestore
-                    g_firestore.collection("Questions").document(questionId)
-                            .delete()
-                            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    // Xóa câu hỏi khỏi danh sách câu hỏi
-                                    g_quesList.remove(quesID);
-
-                                    // Thông báo cho RecyclerView.Adapter về sự thay đổi
-                                    quesAdapter.notifyDataSetChanged();
-
-                                    // Hiển thị thông báo "Câu hỏi đã bị xóa"
-                                    Toast.makeText(QuestionsActivity.this, "Question has been deleted.", Toast.LENGTH_SHORT).show();
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    // Xử lý lỗi, ví dụ: hiển thị thông báo lỗi
-                                }
-                            });
-                }
             }
         });
 
